@@ -1,0 +1,22 @@
+# Ignore everything
+*
+
+# Except these specific files only
+!.gitignore
+!README.md
+!LICENSE
+
+# hooks - only statusline.js
+!hooks/
+!hooks/statusline.js
+
+# skills - only brainstorm, create-plan, exe-plan, trim
+!skills/
+!skills/brainstorm/
+!skills/brainstorm/**
+!skills/create-plan/
+!skills/create-plan/**
+!skills/exe-plan/
+!skills/exe-plan/**
+!skills/trim/
+!skills/trim/**
