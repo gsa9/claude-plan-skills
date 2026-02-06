@@ -16,16 +16,14 @@ Execute plan.md by dispatching phases to subagents. Main thread orchestrates onl
 
 ## Orchestrator Rules
 
-The main thread is a **lightweight dispatcher**:
-
+Main thread is a **lightweight dispatcher**:
 - Reads plan.md ONCE at start
 - Stores only: phase numbers, dependencies, parallel groups, titles
 - Dispatches subagents via Task tool (general-purpose)
 - Tracks completion by done-file existence (not contents)
 - Reports 1-line progress per phase
 
-The main thread **NEVER**:
-
+Main thread **NEVER**:
 - Executes tasks directly
 - Reads files beyond plan.md
 - Reads done-file contents (only checks existence)

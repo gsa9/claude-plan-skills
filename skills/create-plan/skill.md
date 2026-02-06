@@ -13,7 +13,7 @@ plan.md is the **only context bridge** between this session and execution. Every
 ## Flow
 
 1. **Goal** — Clarify what's being built. Use brainstorm decision block if available
-2. **Research** — Read codebase as needed, identify files, patterns, dependencies
+2. **Research** — Read codebase, identify files, patterns, dependencies
 3. **Design phases** — 3-15 discrete phases, single responsibility each
 4. **Map dependencies** — Identify parallel groups, verify no file collisions
 5. **Write plan.md** — At **repository root** (NEVER in subdirectories)
@@ -57,27 +57,24 @@ plan.md is the **only context bridge** between this session and execution. Every
 
 ## Phase Design Rules
 
-Each phase executes as an **isolated subagent in a fresh context**. It must be self-contained:
+Each phase executes as an **isolated subagent in a fresh context** — must be self-contained:
 
 - **Explicit file paths** — name specific files, never "the file from Phase 2"
 - **No cross-phase references** — describe what's needed, don't point to other phases
-- **Include codebase context** — patterns, naming conventions, constraints the subagent needs to know
+- **Include codebase context** — patterns, naming conventions, constraints the subagent needs
 - **One clear objective** — single responsibility
 - **Concrete tasks** — actionable, unambiguous
 
 ### Complexity & Limits
-
 - SIMPLE: 1-3 tasks | MEDIUM: 4-8 tasks | COMPLEX: 9+ (decompose)
 - Max 20 tasks/phase, max 15 phases/plan
 
 ### Dependencies
-
 - Explicit numeric: "Depends: 2,3"
 - No transitive repetition (if 3→2→1, phase 3 lists only "2")
 - Document what it provides: "Depends: 2 (creates lib/core.py)"
 
 ### Parallel Safety
-
 - Same group MUST NOT touch same files
 - When uncertain, make sequential (safety > speed)
 - Each phase lists what it modifies via **Modifies:** field
@@ -107,4 +104,4 @@ Run /exe-plan in a fresh session to execute.
 Fresh session → /exe-plan → executes → deletes plan.md + plan-results/
 ```
 
-plan.md is disposable. After successful execution, it's deleted — not archived. The code changes are the deliverable, not the plan.
+plan.md is disposable. After successful execution, deleted — not archived. The code changes are the deliverable, not the plan.
