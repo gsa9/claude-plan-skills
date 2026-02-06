@@ -3,48 +3,64 @@ name: brainstorm
 description: "Trigger: /brst, /bstorm, or /brainstorm. Never auto-trigger on think, analyze, or consider."
 ---
 
-# /brainstorm - Interactive Analysis Without Implementation
+# /brainstorm - Explore → Advise → Converge → Ready
 
-Produce comprehensive analysis without making changes.
+Guided thinking that ends with a clear direction. One skill for the full journey from "what should we do?" to "let's plan it."
+
+## When to Use
+
+- Before building anything non-trivial
+- When facing multiple approaches or unclear requirements
+- To surface pitfalls before committing to a path
 
 ## Flow
 
-1. **Ask topic** - "What would you like me to brainstorm about?"
-2. **Gather context** - scope, constraints, success criteria (or skip for defaults)
-3. **Research** - read relevant files, understand current state
-4. **Output analysis** - structured brainstorm with options, pitfalls, recommendations
-5. **Wait** - user decides next step (elaborate, implement, plan, or save)
+### 1. EXPLORE
 
-## Output Structure
+- Ask "What needs solving?" (skip if obvious from conversation)
+- Read relevant codebase files, understand constraints and patterns
+- Surface 2-4 viable approaches with key tradeoffs
+- Identify pitfalls and risks for each
 
-```markdown
-## Brainstorm: [TOPIC]
+### 2. ADVISE
 
-### Context
-[Current state summary]
+Claude gives its honest recommendation:
 
-### Key Findings
-| # | Finding | Impact |
-|---|---------|--------|
+- **Be direct** — "I recommend X because..." not "here are some options"
+- Cite specific codebase evidence (files, patterns, constraints)
+- Flag risks the user may not have considered
+- Suggest scope adjustments if warranted
+- Push back if the user's direction has issues — say so early
 
-### Options
-**Option A/B:** Pros, cons, effort
+### 3. CONVERGE
 
-### Pitfalls
-| Pitfall | Cause | Prevention |
-|---------|-------|------------|
+Interactive dialogue — as many turns as needed:
 
-### Recommendations
-1. Primary choice + rationale
-2. Alternative approach
+- User and Claude discuss, refine, challenge each other
+- Narrow from options to ONE clear direction
+- Claude flags concerns, doesn't rubber-stamp
+- Either converge on a direction or explicitly park the decision
 
-### Next Steps
-- [ ] Actions if user proceeds
+### 4. BRIDGE
+
+When both sides agree, output a compact decision block:
+
 ```
+## Decision: [topic]
+**Approach:** [1-2 sentences — what we're building and how]
+**Why:** [reasons grounded in codebase evidence]
+**Pitfalls:** [key risks to guard against]
+**Scope:** [what's in, what's explicitly out]
+```
+
+Then suggest: "Ready for `/create-plan`?"
+
+The decision block transfers directly into plan.md's Rationale section — keep it tight.
 
 ## Constraints
 
-- **No implementation** - analysis only, no file changes
-- **Cover pitfalls** - most valuable part
-- **Multiple options** - never just one approach
-- **User decides** - end with options, wait for direction
+- **No implementation** — thinking only, no file changes
+- **Claude participates** — recommend, warn, push back, don't just list options
+- **Lean output** — prose over tables, no token-heavy formatting
+- **User controls pace** — never auto-chain to /create-plan
+- **Converge or park** — end with ONE direction or explicitly pause the decision

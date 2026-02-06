@@ -12,21 +12,21 @@ This repo intentionally excludes `settings.json` to avoid overwriting your exist
 ```
 For a less aggressive option, use `"acceptEdits"` instead—it auto-approves file edits but still prompts for other operations. See the [Hooks](#hooks) section below for a custom statusline you may also want to add.
 
-It's a simple workflow (Brainstorm → Plan → Execute) that works best with the right set of custom skills. I prefer these as global skills (in `~/.claude/`) but they work as project-local skills too.
+Three skills, clear roles: **Think → Plan → Do**. `/brainstorm` guides you from open question to clear decision. `/create-plan` turns that decision into a structured plan.md. `/exe-plan` executes it via subagents in a fresh session. The plan is the only artifact that crosses sessions—and it's deleted on success. Code changes are the deliverable, not the plan.
 
 I've also included `/trim`, a skill I've evolved over time that condenses documentation files for token-efficiency.
 
 ## Why Custom Plan Skills?
 
-Claude Code has a [built-in Plan Mode](https://docs.anthropic.com/en/docs/claude-code) that I also use. These custom skills are an alternative I reach for when I want my own control over multi-phase plans—exploring options and pitfalls with `/brainstorm` before committing, then creating structured plans with `/create-plan` that break work into self-contained phases.
+Claude Code has a [built-in Plan Mode](https://docs.anthropic.com/en/docs/claude-code) that I also use. These custom skills are an alternative I reach for when I want my own control over multi-phase plans—exploring options and pitfalls with `/brainstorm` before committing, then creating structured plans with `/create-plan` that break work into self-contained phases for parallel execution.
 
 ### The `/clear` Tip
 
-Claude Code's Plan Mode clears context before execution—a smart design. With these skills, you can achieve the same effect: after `/create-plan` produces your `plan.md`, run `/clear` before `/exe-plan`. This gives the orchestrator a fresh context window, maximizing tokens available for subagent dispatch.
+Claude Code's Plan Mode clears context before execution—a smart design. With these skills, you get the same benefit: after `/create-plan` produces your `plan.md`, run `/clear` before `/exe-plan`. This gives the orchestrator a fresh context window with maximum tokens available for subagent dispatch. plan.md carries all the context forward—the decision rationale, the phase details, everything subagents need.
 
 **Recommended flow:**
 ```
-/brainstorm → discuss → /create-plan → review plan.md → /clear → /exe-plan
+/brainstorm → converge on direction → /create-plan → review plan.md → /clear → /exe-plan
 ```
 
 ### Related Tools and Inspiration
@@ -52,9 +52,9 @@ Custom slash commands invoked with `/<skill-name>`.
 
 | Skill | Purpose |
 |-------|---------|
-| `/brainstorm` | Brainstorm analysis (quick: `/brst`, `/bstorm`) |
-| `/create-plan` | Design structured execution plans |
-| `/exe-plan` | Execute plans via parallel subagents |
+| `/brainstorm` | Think: explore, advise, converge on direction (quick: `/brst`, `/bstorm`) |
+| `/create-plan` | Plan: design structured phases with full context for fresh-session execution |
+| `/exe-plan` | Do: execute via parallel subagents, delete plan on success |
 
 **Iterative by Design**
 
@@ -62,49 +62,56 @@ Software development has always been iterative—you discover what you need day 
 
 **Why This Approach Works**
 
-Since ChatGPT's public release on November 30, 2022, through the transition to Claude Code with Opus 4.5 on the Max plan, one pattern has proven reliable: tight feedback loops with human judgment at decision points. This workflow gives you end-to-end execution from idea to completion while keeping you in control of pace and direction.
+Since ChatGPT's public release on November 30, 2022, through the transition to Claude Code with Opus on the Max plan, one pattern has proven reliable: tight feedback loops with human judgment at decision points. This workflow gives you end-to-end execution from idea to completion while keeping you in control of pace and direction.
 
-**Flow:** `/brainstorm` → analyze options, surface pitfalls → `/create-plan` → structured plan.md → `/exe-plan` → parallel subagents execute → results archived
+**Flow:** `/brainstorm` → explore options, surface pitfalls, converge on ONE direction → `/create-plan` → structured plan.md with rationale → `/clear` → `/exe-plan` → subagents execute → plan deleted
 
 <details>
 <summary><strong>Workflow Overview</strong></summary>
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                    PLANNING WORKFLOW: IDEA → EXECUTION                    │
+│                    PLANNING WORKFLOW: THINK → PLAN → DO                    │
 └─────────────────────────────────────────────────────────────────────────────┘
 
   ┌─────────────┐         ┌─────────────┐         ┌─────────────┐
   │ /brainstorm │         │/create-plan │         │  /exe-plan  │
   │             │         │             │         │             │
-  │  ANALYZE    │────────▶│   DESIGN    │────────▶│   EXECUTE   │
+  │   THINK     │────────▶│    PLAN     │────────▶│     DO      │
   │             │         │             │         │             │
   └─────────────┘         └─────────────┘         └─────────────┘
         │                       │                       │
         ▼                       ▼                       ▼
   ┌─────────────┐         ┌─────────────┐         ┌─────────────┐
-  │ • Options   │         │ • Phases    │         │ • Subagents │
-  │ • Pitfalls  │         │ • Deps      │         │ • Parallel  │
-  │ • Recommend │         │ • Parallel  │         │ • Resume    │
+  │ • Explore   │         │ • Rationale │         │ • Subagents │
+  │ • Advise    │         │ • Phases    │         │ • Parallel  │
+  │ • Converge  │         │ • Deps      │         │ • Resume    │
+  │ • Bridge    │         │ • Parallel  │         │ • Cleanup   │
   └─────────────┘         └─────────────┘         └─────────────┘
         │                       │                       │
         ▼                       ▼                       ▼
   ┌─────────────┐         ┌─────────────┐         ┌─────────────┐
-  │  Analysis   │         │   plan.md   │         │ was-plan-*/ │
-  │  (in chat)  │         │   (file)    │         │  (archive)  │
+  │  Decision   │         │   plan.md   │         │   Deleted   │
+  │  (in chat)  │         │   (bridge)  │         │  (cleanup)  │
   └─────────────┘         └─────────────┘         └─────────────┘
 
   USER CONTROL POINTS
   ───────────────────
-  [1] After /brainstorm → Review analysis, refine direction, or skip to plan
-  [2] After plan.md  → Review phases, adjust, approve when satisfied
-  [3] During /exe    → Monitor progress, fail-fast preserves state for fixes
+  [1] During /brainstorm → Refine direction with Claude, converge when ready
+  [2] After plan.md     → Review phases, adjust, /clear before execution
+  [3] During /exe-plan  → Monitor progress, fail-fast preserves state for fixes
 
   WHY THREE STEPS?
   ────────────────
-  • /brainstorm surfaces unknowns BEFORE committing to a design
-  • /create-plan structures work for parallel, resumable execution
-  • /exe-plan delegates to subagents, keeping main context lean
+  • /brainstorm thinks WITH you — Claude advises, you decide together
+  • /create-plan captures everything in plan.md — the sole context bridge
+  • /exe-plan runs fresh — subagents get isolated context, main thread stays lean
+
+  TOKEN LIFECYCLE
+  ───────────────
+  brainstorm + create-plan share a session (thinking builds on itself)
+  /clear wipes context before exe-plan (plan.md carries everything forward)
+  On success: plan.md + plan-results/ deleted (code is the deliverable)
 ```
 
 </details>
@@ -113,11 +120,11 @@ Since ChatGPT's public release on November 30, 2022, through the transition to C
 
 **Why brainstorm first?** I adopted the idea of prompting Claude to brainstorm from Boris Cherny (then engineer at Anthropic) who describes it in one of his YouTube interviews.
 
+The key evolution: `/brainstorm` isn't just analysis anymore—it's a guided conversation where Claude actively participates. It explores options, gives its honest recommendation, then works with you through interactive dialogue until you both converge on ONE direction. The output is a compact decision block that feeds directly into `/create-plan`'s Rationale section.
+
 In Claude Code, one can use skills in two ways:
 - **Start of conversation** - Begin with just `/brainstorm` to open an interactive session, bouncing ideas back and forth until direction crystallizes
 - **Anywhere in a prompt** - Include `/brainstorm` at the end or mid-prompt to get structured analysis before committing to implementation
-
-Either way, it analyzes without implementing—exploring options, surfacing pitfalls, producing concrete recommendations. This grounds `/create-plan` in findings rather than assumptions.
 
 **Tip:** `/brst` and `/bstorm` are short aliases for `/brainstorm`. I often find myself mid-prompt or at the end of a thought when I realize I want analysis before diving into implementation. Having quick aliases means I can append them without breaking my flow or spelling out the full word.
 
@@ -128,63 +135,62 @@ Either way, it analyzes without implementing—exploring options, surfacing pitf
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                   /brainstorm - Analysis Flow                   │
+│             /brainstorm - Think → Advise → Converge             │
 └─────────────────────────────────────────────────────────────────┘
 
   USER INPUT                    CLAUDE ACTIONS                 OUTPUT
   ──────────                    ──────────────                 ──────
 
   "I want to add              ┌─────────────────┐
-   authentication"    ───────▶│  1. ASK TOPIC   │
-                              │  (if not given) │
-                              └────────┬────────┘
-                                       │
-                              ┌────────▼────────┐
-  scope? constraints? ◀────── │ 2. GATHER       │
-  success criteria?           │    CONTEXT      │──▶ (optional, can skip)
-                              └────────┬────────┘
-                                       │
-                              ┌────────▼────────┐
-                              │ 3. RESEARCH     │
+   authentication"    ───────▶│  1. EXPLORE     │
+                              │  • Ask topic    │
+                              │    (if needed)  │
                               │  • Read files   │
-                              │  • Understand   │
-                              │    current state│
+                              │  • Surface 2-4  │
+                              │    approaches   │
+                              │  • Map pitfalls │
                               └────────┬────────┘
                                        │
                               ┌────────▼────────┐
-                              │ 4. OUTPUT       │──────────────────────┐
-                              │    ANALYSIS     │                      │
-                              └────────┬────────┘                      ▼
-                                       │               ┌───────────────────────────┐
-                              ┌────────▼────────┐      │ ## Brainstorm: [TOPIC]    │
-                              │ 5. WAIT         │      │                           │
-                              │  User decides:  │      │ ### Context               │
-                              │  • elaborate    │      │ [current state]           │
-                              │  • implement    │      │                           │
-                              │  • /create-plan │      │ ### Key Findings          │
-                              │  • save         │      │ | # | Finding | Impact |  │
-                              └─────────────────┘      │                           │
-                                                       │ ### Options               │
-                                                       │ A: pros, cons, effort     │
-                                                       │ B: pros, cons, effort     │
-                                                       │                           │
-                                                       │ ### Pitfalls ◀── CRITICAL │
-                                                       │ | Pitfall | Prevention |  │
-                                                       │                           │
-                                                       │ ### Recommendations       │
-                                                       │ 1. Primary + rationale    │
-                                                       │ 2. Alternative            │
-                                                       │                           │
-                                                       │ ### Next Steps            │
-                                                       │ - [ ] action items        │
-                                                       └───────────────────────────┘
+                              │  2. ADVISE      │
+                              │  Claude gives   │
+                              │  its honest     │
+                              │  recommendation │
+                              │  • "I recommend │
+                              │    X because..."│
+                              │  • Cites code   │
+                              │  • Flags risks  │
+                              └────────┬────────┘
+                                       │
+                              ┌────────▼────────┐
+                              │  3. CONVERGE    │◀──── INTERACTIVE
+                              │  Dialogue:      │      (multiple turns)
+  "what about Y?" ──────────▶│  • User + Claude│
+  "I prefer Z"   ──────────▶│    refine       │
+  "good point"   ──────────▶│  • Narrow to ONE│
+                              │  • Claude flags │
+                              │    concerns     │
+                              └────────┬────────┘
+                                       │
+                              ┌────────▼────────┐
+                              │  4. BRIDGE      │──────────────────────┐
+                              │  Compact output │                      │
+                              │  when aligned   │                      ▼
+                              └────────┬────────┘     ┌────────────────────────────┐
+                                       │              │ ## Decision: [topic]       │
+                              ┌────────▼────────┐     │ **Approach:** JWT + middle │
+                              │  Suggest:       │     │ **Why:** fits existing... │
+                              │  "/create-plan" │     │ **Pitfalls:** token exp.. │
+                              │  when ready     │     │ **Scope:** auth only, no..│
+                              └─────────────────┘     └────────────────────────────┘
 
   CONSTRAINTS
   ───────────
-  ✗ No implementation - analysis only, no file changes
-  ✓ Cover pitfalls    - most valuable part
-  ✓ Multiple options  - never just one approach
-  ⏸ User decides      - end with options, wait for direction
+  ✗ No implementation   - thinking only, no file changes
+  ✓ Claude participates - recommends, warns, pushes back
+  ✓ Lean output         - prose over tables, no token bloat
+  ⏸ User controls pace  - never auto-chains to /create-plan
+  ◉ Converge or park    - ONE direction, or explicitly pause
 ```
 
 </details>
@@ -196,67 +202,72 @@ Either way, it analyzes without implementing—exploring options, surfacing pitf
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                 /create-plan - Design Phases                  │
+│              /create-plan - Design Self-Contained Phases         │
 └─────────────────────────────────────────────────────────────────┘
 
   USER INPUT                    CLAUDE ACTIONS                 OUTPUT
   ──────────                    ──────────────                 ──────
 
   "Build new auth             ┌─────────────────┐
-   system"            ───────▶│ 1. UNDERSTAND   │
-                              │    GOAL         │
+   system"            ───────▶│ 1. GOAL         │
+  (or brainstorm              │  Use decision   │
+   decision block)            │  block if avail │
                               └────────┬────────┘
                                        │
                               ┌────────▼────────┐
-  scope? constraints? ◀────── │ 2. CLARIFY      │
-  success criteria?           │    SCOPE        │
-                              └────────┬────────┘
-                                       │
-                              ┌────────▼────────┐
-                              │ 3. RESEARCH     │
+                              │ 2. RESEARCH     │
                               │  • Read files   │
                               │  • Find patterns│
                               │  • Map deps     │
                               └────────┬────────┘
                                        │
                               ┌────────▼────────┐
-                              │ 4. DESIGN       │
+                              │ 3. DESIGN       │
                               │    PHASES       │
                               │  • 3-15 phases  │
                               │  • Single resp. │
-                              │  • Clear scope  │
+                              │  • Self-contain │
                               └────────┬────────┘
                                        │
                               ┌────────▼────────┐
-                              │ 5. MAP          │
+                              │ 4. MAP          │
                               │    DEPENDENCIES │
-                              │  • Which waits  │
-                              │    for what     │
                               │  • Parallel safe│
+                              │  • No collisions│
                               └────────┬────────┘
                                        │
                               ┌────────▼────────┐
-                              │ 6. WRITE        │──────────────────────┐
+                              │ 5. WRITE        │──────────────────────┐
                               │    plan.md      │                      │
                               └────────┬────────┘                      ▼
                                        │               ┌───────────────────────────┐
                               ┌────────▼────────┐      │ <!-- @plan: ... -->       │
-                              │ 7. CONFIRM      │      │ # Goal Title              │
+                              │ 6. CONFIRM      │      │ # Goal Title              │
                               │  Show summary   │      │                           │
-                              │  Get approval   │      │ | Phase | Depends | Group │
-                              └─────────────────┘      │ |-------|---------|-------|
+                              │  Suggest /clear │      │ ## Rationale              │
+                              │  then /exe-plan │      │ **Approach:** JWT + ...   │
+                              └─────────────────┘      │ **Why:** fits existing... │
+                                                       │ **Pitfalls:** token...    │
+                                                       │                           │
+                                                       │ | Phase | Depends | Group │
+                                                       │ |-------|---------|-------|
                                                        │ | 1     | -       | A     │
                                                        │ | 2     | 1       | B     │
-                                                       │ | 3     | 1       | B     │
-                                                       │ | 4     | 2,3     | C     │
                                                        │                           │
                                                        │ ## Phase 1: ... [SIMPLE]  │
                                                        │ **Depends:** none         │
                                                        │ **Modifies:** src/auth/   │
                                                        │ **Tasks:**                │
                                                        │ - [ ] Create base module  │
-                                                       │ - [ ] Add types           │
                                                        └───────────────────────────┘
+
+  PLAN.MD IS THE CONTEXT BRIDGE
+  ─────────────────────────────
+  Everything a fresh /exe-plan session needs is IN the plan:
+  ✓ Rationale   - why this approach, what pitfalls to avoid
+  ✓ Phases      - self-contained, no cross-phase references
+  ✓ File paths  - explicit, never "the file from Phase 2"
+  ✓ Context     - patterns, conventions subagents need to know
 
   PHASE DESIGN RULES
   ──────────────────
@@ -285,8 +296,11 @@ Either way, it analyzes without implementing—exploring options, surfacing pitf
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│              /exe-plan - Orchestrated Execution               │
+│              /exe-plan - Orchestrated Execution                 │
 └─────────────────────────────────────────────────────────────────┘
+
+  DESIGNED FOR FRESH SESSION — no prior context needed.
+  plan.md contains everything.
 
                     ORCHESTRATOR (main context)
                     ───────────────────────────
@@ -329,20 +343,19 @@ Either way, it analyzes without implementing—exploring options, surfacing pitf
           │ └─────────┘           └─────────┘     │
           │                  │                    │
           │  ┌───────────────▼─────────────────┐  │
-          │  │ Record: "✓ Phase N: summary"   │  │
-          │  │ (do NOT store subagent details)│  │
+          │  │ Log: "✓ Phase N: [title]"      │  │
+          │  │ (1 line only, no details)      │  │
           │  └───────────────┬─────────────────┘  │
           │                  │                    │
           │         [continue until done]         │
           └───────────────────┬───────────────────┘
                               │
                     ┌─────────▼─────────┐
-                    │ 4. ARCHIVE        │
-                    │ was-plan-YYMMDD-  │
-                    │   HHMM/           │
-                    │  ├─ plan.md       │
-                    │  ├─ done-01.md    │
-                    │  └─ ...           │
+                    │ 4. CLEANUP        │
+                    │  • Delete plan-   │
+                    │    results/       │
+                    │  • Delete plan.md │
+                    │  • Report summary │◀─── code is the deliverable
                     └───────────────────┘
 
   CONTEXT EFFICIENCY
@@ -350,15 +363,21 @@ Either way, it analyzes without implementing—exploring options, surfacing pitf
   ORCHESTRATOR          │ SUBAGENT
   ──────────────────────│─────────────────────
   • Reads plan ONCE     │ • Gets ONLY its phase
-  • Tracks phase #s     │ • Explores codebase
-  • Never executes      │ • Writes done file
-  • Stays minimal       │ • Returns summary
+  • Tracks phase #s     │ • Gets Rationale (pitfalls)
+  • Never executes      │ • Explores codebase
+  • Stays minimal       │ • Writes done file
+  • 1 line per phase    │ • Returns summary
 
   FAIL-FAST + RESUME
   ──────────────────
   ✗ Any failure → STOP immediately
   ✓ Progress preserved in plan-results/
   ✓ Re-run /exe-plan → resumes from failure point
+
+  ON SUCCESS → DELETE
+  ───────────────────
+  plan.md and plan-results/ are deleted.
+  The code changes are what matter.
 
   FLAGS
   ─────
@@ -369,16 +388,15 @@ Either way, it analyzes without implementing—exploring options, surfacing pitf
 
 ---
 
-**Features:** Phases with dependencies · Parallel groups · Fail-fast with resume · Progress tracking in plan-results/ · Auto-archive to was-plan-YYMMDD-HHMM/
+**Features:** Phases with dependencies · Parallel groups · Fail-fast with resume · Rationale section for decision context · Clean delete on success
 
 **Location Rules:** All plan artifacts live at repository root—never in subdirectories:
 - `plan.md` → repo root
 - `plan-results/` → repo root
-- `was-plan-YYMMDD-HHMM/` → repo root
 
-**Plan Archives:** Completed plans are saved to `was-plan-YYMMDD-HHMM/` folders with all phase results preserved. Useful for reviewing what was done, tracking project history, or sharing execution details with team members. That said, Claude Code with Opus 4.5 has become so effective that I often just delete these folders after a plan finishes—the code speaks for itself and re-planning is trivial when needed.
+**Token-Efficient Lifecycle:** plan.md is disposable. It exists to bridge the gap between the thinking session (brainstorm + create-plan) and the execution session (exe-plan). On success, both plan.md and plan-results/ are deleted. The code changes are the deliverable—re-planning is trivial when needed.
 
-**Context Efficiency:** The orchestrator (main context) stays lean by delegating work to subagents. Each phase runs in isolated context, so complex plans execute without hitting limits.
+**Context Efficiency:** The orchestrator (main context) stays lean by delegating work to subagents. Each phase runs in isolated context, so complex plans execute without hitting limits. The Rationale section in plan.md gives subagents awareness of the "why" and pitfalls without the orchestrator having to relay brainstorm context.
 
 **Fast execution:** With permissions pre-approved, execution is fast and—when you're confident—can run unsupervised to completion.
 
@@ -388,6 +406,17 @@ Example `plan.md`:
 ```markdown
 <!-- @plan: /create-plan 260124_1430 -->
 # Migrate to New API
+
+**Goal:** Replace legacy REST client with new versioned API across client and server.
+**Created:** 2026-01-24
+
+## Rationale
+
+**Approach:** Incremental migration — new types first, then client/server in parallel
+**Why:** Existing code already uses typed responses; adding new types is non-breaking
+**Pitfalls:** Client and server share response types — must update types before either
+
+## Phases Overview
 
 | Phase | Name | Depends | Parallel Group | Complexity |
 |-------|------|---------|----------------|------------|
