@@ -12,7 +12,7 @@ plan.md is the **only context bridge** between this session and execution. Every
 
 ## Flow
 
-1. **Goal** — Clarify what's being built. Use brainstorm decision block if available
+1. **Goal** — Clarify what's being built. Use /brst (brainstorm) decision block if available
 2. **Research** — Read codebase, identify files, patterns, dependencies
 3. **Design phases** — 3-15 discrete phases, single responsibility each
 4. **Map dependencies** — Identify parallel groups, verify no file collisions
@@ -30,7 +30,7 @@ plan.md is the **only context bridge** between this session and execution. Every
 
 ## Rationale
 
-**Approach:** [chosen approach — from brainstorm or stated by user]
+**Approach:** [chosen approach — from /brst or stated by user]
 **Why:** [key reasons grounded in codebase evidence]
 **Pitfalls:** [risks to guard against during execution]
 
