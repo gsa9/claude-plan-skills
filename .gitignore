@@ -10,10 +10,10 @@
 !hooks/
 !hooks/statusline.js
 
-# skills - only brainstorm, create-plan, exe-plan, trim
+# skills - only brst, create-plan, exe-plan, trim
 !skills/
-!skills/brainstorm/
-!skills/brainstorm/**
+!skills/brst/
+!skills/brst/**
 !skills/create-plan/
 !skills/create-plan/**
 !skills/exe-plan/

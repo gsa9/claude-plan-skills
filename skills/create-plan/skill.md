@@ -99,7 +99,7 @@ Run /exe-plan in a fresh session to execute.
 ## Lifecycle
 
 ```
-/brainstorm → /create-plan → plan.md written
+/brst → /create-plan → plan.md written
     ↓
 Fresh session → /exe-plan → executes → deletes plan.md + plan-results/
 ```

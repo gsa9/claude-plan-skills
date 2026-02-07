@@ -8,7 +8,7 @@ argument-hint: "[--sequential]"
 
 Execute plan.md by dispatching phases to subagents. Main thread orchestrates only.
 
-**Designed for fresh session** — no prior brainstorm or create-plan context needed. plan.md contains everything.
+**Designed for fresh session** — no prior brst or create-plan context needed. plan.md contains everything.
 
 ## Flags
 

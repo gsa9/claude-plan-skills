@@ -12,13 +12,13 @@ This repo intentionally excludes `settings.json` to avoid overwriting your exist
 ```
 For a less aggressive option, use `"acceptEdits"` instead—it auto-approves file edits but still prompts for other operations. See the [Hooks](#hooks) section below for a custom statusline you may also want to add.
 
-Three skills, clear roles: **Think → Plan → Do**. `/brainstorm` guides you from open question to clear decision. `/create-plan` turns that decision into a structured plan.md. `/exe-plan` executes it via subagents in a fresh session. The plan is the only artifact that crosses sessions—and it's deleted on success. Code changes are the deliverable, not the plan.
+Three skills, clear roles: **Think → Plan → Do**. `/brst` guides you from open question to clear decision. `/create-plan` turns that decision into a structured plan.md. `/exe-plan` executes it via subagents in a fresh session. The plan is the only artifact that crosses sessions—and it's deleted on success. Code changes are the deliverable, not the plan.
 
 I've also included `/trim`, a skill I've evolved over time that condenses documentation files for token-efficiency.
 
 ## Why Custom Plan Skills?
 
-Claude Code has a [built-in Plan Mode](https://docs.anthropic.com/en/docs/claude-code) that I also use. These custom skills are an alternative I reach for when I want my own control over multi-phase plans—exploring options and pitfalls with `/brainstorm` before committing, then creating structured plans with `/create-plan` that break work into self-contained phases for parallel execution.
+Claude Code has a [built-in Plan Mode](https://docs.anthropic.com/en/docs/claude-code) that I also use. These custom skills are an alternative I reach for when I want my own control over multi-phase plans—exploring options and pitfalls with `/brst` before committing, then creating structured plans with `/create-plan` that break work into self-contained phases for parallel execution.
 
 ### The `/clear` Tip
 
@@ -26,7 +26,7 @@ Claude Code's Plan Mode clears context before execution—a smart design. With t
 
 **Recommended flow:**
 ```
-/brainstorm → converge on direction → /create-plan → review plan.md → /clear → /exe-plan
+/brst → converge on direction → /create-plan → review plan.md → /clear → /exe-plan
 ```
 
 ### Related Tools and Inspiration
@@ -35,7 +35,7 @@ I was already using multi-phase planning skills when I discovered [GSD (Get Shit
 
 Interestingly, Claude Code's built-in Plan Mode uses similar tactics—we're all converging on the same insight: **delegate context consumption to isolated agents**.
 
-GSD does more than I need for my workflow. `/brainstorm`, `/create-plan`, and `/exe-plan` take a lighter approach for developers who prefer tighter feedback loops—brainstorming first, refining plans conversationally, steering direction as needed. More elaborate plans consume more of your usage allowance, which matters on Claude Code's Max plan where token efficiency is important.
+GSD does more than I need for my workflow. `/brst`, `/create-plan`, and `/exe-plan` take a lighter approach for developers who prefer tighter feedback loops—brainstorming first, refining plans conversationally, steering direction as needed. More elaborate plans consume more of your usage allowance, which matters on Claude Code's Max plan where token efficiency is important.
 
 ## Installation
 
@@ -52,7 +52,7 @@ Custom slash commands invoked with `/<skill-name>`.
 
 | Skill | Purpose |
 |-------|---------|
-| `/brainstorm` | Think: explore, advise, converge on direction (quick: `/brst`, `/bstorm`) |
+| `/brst` | Think: explore, advise, converge on direction (aliases: `/bstorm`, `/brainstorm`) |
 | `/create-plan` | Plan: design structured phases with full context for fresh-session execution |
 | `/exe-plan` | Do: execute via parallel subagents, delete plan on success |
 
@@ -64,7 +64,7 @@ Software development has always been iterative—you discover what you need day 
 
 Since ChatGPT's public release on November 30, 2022, through the transition to Claude Code with Opus on the Max plan, one pattern has proven reliable: tight feedback loops with human judgment at decision points. This workflow gives you end-to-end execution from idea to completion while keeping you in control of pace and direction.
 
-**Flow:** `/brainstorm` → explore options, surface pitfalls, converge on ONE direction → `/create-plan` → structured plan.md with rationale → `/clear` → `/exe-plan` → subagents execute → plan deleted
+**Flow:** `/brst` → explore options, surface pitfalls, converge on ONE direction → `/create-plan` → structured plan.md with rationale → `/clear` → `/exe-plan` → subagents execute → plan deleted
 
 <details>
 <summary><strong>Workflow Overview</strong></summary>
@@ -75,7 +75,7 @@ Since ChatGPT's public release on November 30, 2022, through the transition to C
 └─────────────────────────────────────────────────────────────────────────────┘
 
   ┌─────────────┐         ┌─────────────┐         ┌─────────────┐
-  │ /brainstorm │         │/create-plan │         │  /exe-plan  │
+  │    /brst    │         │/create-plan │         │  /exe-plan  │
   │             │         │             │         │             │
   │   THINK     │────────▶│    PLAN     │────────▶│     DO      │
   │             │         │             │         │             │
@@ -97,13 +97,13 @@ Since ChatGPT's public release on November 30, 2022, through the transition to C
 
   USER CONTROL POINTS
   ───────────────────
-  [1] During /brainstorm → Refine direction with Claude, converge when ready
+  [1] During /brst → Refine direction with Claude, converge when ready
   [2] After plan.md     → Review phases, adjust, /clear before execution
   [3] During /exe-plan  → Monitor progress, fail-fast preserves state for fixes
 
   WHY THREE STEPS?
   ────────────────
-  • /brainstorm thinks WITH you — Claude advises, you decide together
+  • /brst thinks WITH you — Claude advises, you decide together
   • /create-plan captures everything in plan.md — the sole context bridge
   • /exe-plan runs fresh — subagents get isolated context, main thread stays lean
 
@@ -120,22 +120,22 @@ Since ChatGPT's public release on November 30, 2022, through the transition to C
 
 **Why brainstorm first?** I adopted the idea of prompting Claude to brainstorm from Boris Cherny (then engineer at Anthropic) who describes it in one of his YouTube interviews.
 
-The key evolution: `/brainstorm` isn't just analysis anymore—it's a guided conversation where Claude actively participates. It explores options, gives its honest recommendation, then works with you through interactive dialogue until you both converge on ONE direction. The output is a compact decision block that feeds directly into `/create-plan`'s Rationale section.
+The key evolution: `/brst` isn't just analysis anymore—it's a guided conversation where Claude actively participates. It explores options, gives its honest recommendation, then works with you through interactive dialogue until you both converge on ONE direction. The output is a compact decision block that feeds directly into `/create-plan`'s Rationale section.
 
 In Claude Code, one can use skills in two ways:
-- **Start of conversation** - Begin with just `/brainstorm` to open an interactive session, bouncing ideas back and forth until direction crystallizes
-- **Anywhere in a prompt** - Include `/brainstorm` at the end or mid-prompt to get structured analysis before committing to implementation
+- **Start of conversation** - Begin with just `/brst` to open an interactive session, bouncing ideas back and forth until direction crystallizes
+- **Anywhere in a prompt** - Include `/brst` at the end or mid-prompt to get structured analysis before committing to implementation
 
-**Tip:** `/brst` and `/bstorm` are short aliases for `/brainstorm`. I often find myself mid-prompt or at the end of a thought when I realize I want analysis before diving into implementation. Having quick aliases means I can append them without breaking my flow or spelling out the full word.
+**Tip:** `/bstorm` and `/brainstorm` are longer aliases for `/brst`. I often find myself mid-prompt or at the end of a thought when I realize I want analysis before diving into implementation. Having a short primary command means I can append it without breaking my flow.
 
 ---
 
 <details>
-<summary><strong>/brainstorm Flow Diagram</strong></summary>
+<summary><strong>/brst Flow Diagram</strong></summary>
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│             /brainstorm - Think → Advise → Converge             │
+│                /brst - Think → Advise → Converge                │
 └─────────────────────────────────────────────────────────────────┘
 
   USER INPUT                    CLAUDE ACTIONS                 OUTPUT
@@ -210,7 +210,7 @@ In Claude Code, one can use skills in two ways:
 
   "Build new auth             ┌─────────────────┐
    system"            ───────▶│ 1. GOAL         │
-  (or brainstorm              │  Use decision   │
+  (or brst                    │  Use decision   │
    decision block)            │  block if avail │
                               └────────┬────────┘
                                        │

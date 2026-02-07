@@ -1,9 +1,9 @@
 ---
-name: brainstorm
+name: brst
 description: "Trigger: /brst, /bstorm, or /brainstorm. Never auto-trigger on think, analyze, or consider."
 ---
 
-# /brainstorm - Explore → Advise → Converge → Ready
+# /brst - Explore → Advise → Converge → Ready
 
 Guided thinking from "what should we do?" to "let's plan it."
 
